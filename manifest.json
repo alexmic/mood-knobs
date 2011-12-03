@@ -9,5 +9,5 @@
     "SupportedLanguages": [
         "en"
     ],
-    "RequiredPermissions": ["http://*.spotify.com"]
+    "RequiredPermissions": ["http://*.spotify.com", "http://ws.audioscrobbler.com", "ws.audioscrobbler.com"]
 }
