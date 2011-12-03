@@ -41,7 +41,7 @@
 			}
 			
 			knob.on('mousedown touchstart', function(e){
-			
+				console.log(knob);
 				e.preventDefault();
 			
 				var offset = knob.offset();
