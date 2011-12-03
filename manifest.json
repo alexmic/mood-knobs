@@ -8,5 +8,6 @@
     },
     "SupportedLanguages": [
         "en"
-    ]
+    ],
+    "RequiredPermissions": ["http://*.spotify.com"]
 }
