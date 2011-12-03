@@ -7,25 +7,56 @@
     <link rel="stylesheet" href="libs/css/styles.css">
 </head>
 <body>
-	<h1 id="header">Knobs and stuff</h1>
-	<div id="synthi">
-		<div id="knob1">
-		
-		
-		</div>
-		<div id="knob2">
-		
-		
-		</div>
-		<div id="knob3">
-		
-		
-		</div>
+	<div id="title">
+		Synthesizer
 	</div>
+	<div id="main">
+		<div id="synthi">
+			<div id="knob-dark" class="synthi-knob">
+				<div class="bars">
+					<div class="control">
+					
+					
+					</div>
+				</div>
+			</div>
+			<!--div id="knob-ambient" class="synthi-knob">
+				<div class="bars">
+					<div class="control">
+					
+					
+					</div>
+				</div>
+			</div>
+			<div id="knob-rowdy" class="synthi-knob">
+				<div class="bars">
+					<div class="control">
+					
+					
+					</div>
+				</div>
+			</div>
+			<div id="know-smooth" class="synthi-knob">
+				<div class="bars">
+					<div class="control">
+					
+					
+					</div>
+				</div>
+			</div-->
+	</div>
+	
 	<script src="libs/js/jquery.js"></script>
 	<script src="libs/js/underscore.js"></script>
 	<script src="libs/js/transform.js"></script>
 	<script src="libs/js/knobknob.jquery.js"></script>
 	<script src="app/app.js"></script>
+	<script>
+		$(function() {
+			var app = new App();
+			app.init();
+			console.log("hi");
+		});
+	</script>
 </body>
 </html>
