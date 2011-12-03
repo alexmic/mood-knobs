@@ -4,10 +4,14 @@
         "36x18": "tutorial.png"
     },
     "AppName": {
-        "en": "Tutorial"
+        "en": "Mood Knobs"
     },
     "SupportedLanguages": [
         "en"
     ],
-    "RequiredPermissions": ["http://*.spotify.com", "http://ws.audioscrobbler.com", "ws.audioscrobbler.com"]
+    "RequiredPermissions": ["http://*.spotify.com", 
+    					    "http://ws.audioscrobbler.com", 
+    					    "ws.audioscrobbler.com"
+    					    "http://developer.echonest.com",
+    					    "developer.echonest.com"]
 }

@@ -1,4 +1,4 @@
-var Knob = function(elemId, searchTerm)
+var Knob = function(elemId, searchTerm, initialValue)
 {
 	var elemId     = elemId,
 		elem       = $("#" + elemId),
@@ -10,14 +10,22 @@ var Knob = function(elemId, searchTerm)
 		height     = elem.height(),
 		width      = elem.width(),
 		radius	   = null,
+		initial    = initialValue || 0,
 		colors     = [
 			'26e000','51ef00','B8FF05','FFEA05','FFC60A',
 			'ff8607','ff7005', 'ff5f04','ff4f03','f83a00','ee2b00'
 		];
-		this.boost = 0;
 	
 	return {
-	
+		
+		boost: 0,
+		
+		getQS: function() 
+		{
+			console.log(this);
+			return searchTerm;	
+		},
+		
 		draw: function() 
 		{
 			elem.empty();
@@ -47,18 +55,19 @@ var Knob = function(elemId, searchTerm)
 			var colorBars = barsElem.find('.colorBar');
 			
 			// Draw knob.
+			var that = this;
 			$("#" + elemId + " div.bars div.control").knobKnob({
 				snap : 10,
-				value: 0,
+				value: initial,
 				turn : function(ratio) {
-					var step = Math.round((ratio * steps) / 0.5);
+					var dialStep = Math.min(9, Math.round((ratio * steps) / 0.5));
+					that.boost   = Math.min(2, Math.round((10 * (ratio * 2) / 0.5)) / 10);
 					colorBars.each(function(i, e) {
-						if (i >= step) {
+						if (i >= dialStep) {
 							$(e).css("backgroundColor", "black");
 						} else {
 							$(e).css("backgroundColor", $(e).attr("active-color"));
 						}
-					
 					});
 					
 				}
@@ -74,6 +83,7 @@ var App = function()
 {
 	var knobs     = [],
 		mainElem  = $("#main"),
+		baseQS 	  = "http://developer.echonest.com/api/v4/artist/search?api_key=N6E4NIOVYMTHNDM8J&format=json&results=100",
 		titleElem = $("#title"); 
 	
 	return {
@@ -93,9 +103,13 @@ var App = function()
 			// Make and store knobs.
 			var proxied = $.proxy(function(i, e) {
 				var id   = $(e).attr("id"),
-					term = id.split("-")[1];
-				knobs.push(new Knob(id, term));
-				console.log("h");
+					term = id.split("-")[1],
+					rnd  = Math.random(),
+					init = 0;
+				if (rnd > 0.7) {
+					init = 90;
+				}
+				knobs.push(new Knob(id, term, init));
 			}, this);
 
 			$(".synthi-knob").each(proxied);
@@ -114,8 +128,29 @@ var App = function()
 		knobs: function() 
 		{
 			return knobs;
+		},
+		
+		search: function() 
+		{
+			var i   	  = 0,
+				qs  	  = baseQS + "&mood=",
+				knobTerms = []; 
+			
+			for (i = 0; i < knobs.length; i++) {
+				knobTerms.push(knobs[i].getQS());
+			}
+			
+			qs += knobTerms.join(",");
+			
+			$.getJSON(qs).success(function(data) {
+				console.log(data);
+			});
+			
 		}
 	
 	};
 
 };
+
+exports.Knob = Knob;
+exports.App  = App;

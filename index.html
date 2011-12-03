@@ -18,15 +18,7 @@
 			</div>
 			<div id="knob-rowdy" class="synthi-knob clearfix">
 			</div>
-			<div id="know-smooth" class="synthi-knob clearfix">
-			</div>
-			<div id="knob-alex" class="synthi-knob clearfix">
-			</div>
-			<div id="knob-fredrik" class="synthi-knob clearfix">
-			</div>
-			<div id="knob-alex1" class="synthi-knob clearfix">
-			</div>
-			<div id="knob-fredrik1" class="synthi-knob clearfix">
+			<div id="knob-smooth" class="synthi-knob clearfix">
 			</div>
 	</div>
 	
@@ -34,12 +26,12 @@
 	<script src="libs/js/underscore.js"></script>
 	<script src="libs/js/transform.js"></script>
 	<script src="libs/js/knobknob.jquery.js"></script>
-	<script src="app/app.js"></script>
 	<script>
 		$(function() {
-			var app = new App();
-			app.init().draw();
-			console.log("hi");
+			sp  = getSpotifyApi(1);
+			var a   = sp.require("app/app"),
+				app = a.App();
+			app.init().draw().search();
 		});
 	</script>
 </body>

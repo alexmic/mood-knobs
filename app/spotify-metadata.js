@@ -1,4 +1,3 @@
-sp = getSpotifyApi(1);
 var _ = sp.require('libs/js/underscore')._;
 var m = sp.require('sp://import/scripts/api/models');
 

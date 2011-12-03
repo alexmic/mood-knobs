@@ -21,12 +21,11 @@
 				<div class="base"></div>\
 			</div>';
 	
-		return this.each(function(){
-			
-			var el = $(this);
+		return this.each(function(i, e){
+			var el = $(e);
 			el.append(tpl);
 			
-			var knob = $('.knob',el)
+			var knob = $('.knob',el),
 				knobTop = knob.find('.top'),
 				startDeg = -1,
 				currentDeg = 0,
@@ -41,7 +40,6 @@
 			}
 			
 			knob.on('mousedown touchstart', function(e){
-				console.log(knob);
 				e.preventDefault();
 			
 				var offset = knob.offset();
