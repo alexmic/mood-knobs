@@ -10,8 +10,8 @@
 	<div id="title">
 		Mood Knobs
 	</div>
-	<div id="main">
-		<div id="synthi" class="clearfix">
+	<div id="main" class="clearfix">
+		<div id="synthi" class="column clearfix">
 			<div id="knob-dark" class="synthi-knob clearfix">
 			</div>
 			<div id="knob-ambient" class="synthi-knob clearfix">
@@ -20,9 +20,15 @@
 			</div>
 			<div id="knob-smooth" class="synthi-knob clearfix">
 			</div>
+		</div>
+		<div id="anim" class="column clearfix">
+		
+		</div>
 	</div>
 	
 	<script src="libs/js/jquery.js"></script>
+	<script src="libs/js/jquery-ui.min.js"></script>
+
 	<script src="libs/js/underscore.js"></script>
 	<script src="libs/js/transform.js"></script>
 	<script src="libs/js/knobknob.jquery.js"></script>
@@ -31,7 +37,7 @@
 			sp  = getSpotifyApi(1);
 			var a   = sp.require("app/app"),
 				app = a.App();
-			app.init().draw().search();
+			app.init().draw().search(true);
 		});
 	</script>
 </body>

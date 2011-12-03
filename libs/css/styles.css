@@ -20,14 +20,20 @@ head, body {
 	text-align: center;
 	border-bottom: 1px solid black;
 	font-size: 1.38em;
+	z-index: 10;
 }
 
 #synthi {
-	width: 25%;
+	width: 300px;
 	height: 100%;
 	/*background-image: url("../../res/imgs/back.png");
 	border-right: 1px solid black;
 	-webkit-box-shadow: 1px 0px 5px #222;*/
+}
+
+#anim {
+	width: 350px;
+	height: 100%;
 }
 
 .synthi-knob {
@@ -47,6 +53,20 @@ head, body {
 	width: 45px;
 	position: absolute;
 	bottom: -15px;
+}
+
+.column {
+	float: left;
+	position: relative;
+}
+
+.song {
+	width: 350px;
+	box-shadow: 0px 1px 4px black;
+	background-color: white;
+	border-radius: 5px;
+	color: black;
+	height: 50px;
 }
 
 

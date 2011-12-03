@@ -1,3 +1,60 @@
+var spm = sp.require("app/spotify-metadata");
+
+var Song = function(data) 
+{
+	var title = data.title,
+		artist = data.artist_name,
+		top  = 0,
+		spUrl = null,
+		elem = $("<div class='song'>" + title + "</div>")
+				.css({
+					top: top,
+					position: 'absolute'
+				}),
+		speed = 1;
+	
+	// Find spotify url.
+	var onDrag = function() {
+		console.log("start drag");
+		var onSearchReturn = function(err, tracks) {
+			if (err) {
+				throw "Blow";
+			} 
+			if (tracks) {
+				console.log(tracks);
+			}
+		}
+		spm.searchForTrack(artist, 
+						   title,
+						   onSearchReturn);
+	
+	};
+	
+	
+	$("#anim").append(elem);
+	
+	elem.draggable({
+		helper: 'clone',
+		containment: '#main',
+		start: onDrag
+	});
+	
+	return {
+		
+		update: function() 
+		{
+				top += speed;
+				elem.css('top', top);
+		},
+		
+		inBounds: function()
+		{
+			return true;
+		}
+	}
+
+};
+
 var Knob = function(elemId, searchTerm, initialValue)
 {
 	var elemId     = elemId,
@@ -22,8 +79,7 @@ var Knob = function(elemId, searchTerm, initialValue)
 		
 		getQS: function() 
 		{
-			console.log(this);
-			return searchTerm;	
+			return searchTerm + "^" + this.boost;	
 		},
 		
 		draw: function() 
@@ -69,11 +125,9 @@ var Knob = function(elemId, searchTerm, initialValue)
 							$(e).css("backgroundColor", $(e).attr("active-color"));
 						}
 					});
-					
 				}
 			});
 		}
-
 	};
 	
 };
@@ -83,19 +137,19 @@ var App = function()
 {
 	var knobs     = [],
 		mainElem  = $("#main"),
+		running   = false,
 		apiKey    = "N6E4NIOVYMTHNDM8J",
 		params    = $.param({
 			api_key : apiKey,
 			format  : 'json',
-			type    : 'jsonp',
-			callback: '?',
 			results : 100
 		}),
-		baseQuery = 'http://developer.echonest.com/api/v4/artist/search?' + params,
+		baseQuery = 'http://developer.echonest.com/api/v4/song/search?' + params,
 		titleElem = $("#title"); 
 	
 	return {
 		
+		buffer: [],
 		init: function() 
 		{
 			var h = $(document).height() - titleElem.height();	
@@ -138,7 +192,7 @@ var App = function()
 			return knobs;
 		},
 		
-		search: function() 
+		search: function(startAnim) 
 		{
 			var i = 0,
 				qs = baseQuery + "&",
@@ -150,10 +204,60 @@ var App = function()
 			
 			qs += knobTerms.join("&mood=");
 	
-			$.getJSON(qs, function(data) {
-				console.log(data);
-			});
-			
+			// Buffer 100 results.
+			$.getJSON(qs, $.proxy(function(data) {
+				if (data.response.status.message === 'Success') {
+					this.buffer = data.response.songs;
+				}
+				if (startAnim) {
+					this.animate();
+				}
+			}, this));
+		},
+		
+		animate: function() 
+		{
+			running = true;
+			var lastFrame = null,
+				diff      = 0,
+				that      = this,
+				drawables = [],
+				i = 0;
+			(function animLoop(time) {
+				if (running) {
+					webkitRequestAnimationFrame(animLoop, $("#anim"));
+					var now = new Date();
+					if (lastFrame !== null) {
+						diff += now - lastFrame;
+						if (diff > 2000) {
+							var song = that.pick();
+							drawables.push(song);
+							diff = 0;
+						}
+						for (i = 0; i < drawables.length; i++) {
+							var d = drawables[i];
+							if (!d) {
+								return;
+							}
+							d.update();
+							if (!d.inBounds()) {
+								delete drawables[i];
+							}
+						}
+					}
+					lastFrame = now;
+				}
+    		})();		
+		},
+		
+		pick: function() 
+		{
+			return new Song(this.buffer.pop());
+		},
+		
+		stopAnimation: function() 
+		{
+			running = false;
 		}
 	
 	};

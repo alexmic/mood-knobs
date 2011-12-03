@@ -11,7 +11,7 @@
     ],
     "RequiredPermissions": ["http://*.spotify.com", 
     					    "http://ws.audioscrobbler.com", 
-    					    "ws.audioscrobbler.com"
+    					    "ws.audioscrobbler.com",
     					    "http://developer.echonest.com",
     					    "developer.echonest.com"]
 }
