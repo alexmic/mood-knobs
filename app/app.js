@@ -83,7 +83,8 @@ var App = function()
 {
 	var knobs     = [],
 		mainElem  = $("#main"),
-		baseQS 	  = "http://developer.echonest.com/api/v4/artist/search?api_key=N6E4NIOVYMTHNDM8J&format=json&results=100",
+		api_key   = "VGHOFULQYBLG0DCT5",
+		baseQS 	  = "http://developer.echonest.com/api/v4/artist/search?api_key="+api_key+"&format=json&results=100",
 		titleElem = $("#title"); 
 	
 	return {
@@ -133,16 +134,17 @@ var App = function()
 		search: function() 
 		{
 			var i   	  = 0,
-				qs  	  = baseQS + "&mood=",
+				qs  	  = baseQS+"&",
 				knobTerms = []; 
 			
 			for (i = 0; i < knobs.length; i++) {
 				knobTerms.push(knobs[i].getQS());
 			}
 			
-			qs += knobTerms.join(",");
-			
-			$.getJSON(qs).success(function(data) {
+			qs += knobTerms.join("&mood=");
+			console.log("url: " + qs)
+
+			$.getJSON(qs, function(data) {
 				console.log(data);
 			});
 			
