@@ -15,7 +15,7 @@ head, body {
 
 #synthi {
 	width: 25%;
-	height: 500px;
+	height: 100%;
 	background-image: url("../../res/imgs/back.png");
 	border-right: 1px solid black;
 	-webkit-box-shadow: 1px 0px 5px #222;
@@ -96,7 +96,7 @@ head, body {
 
 .control{
 	width:39%;
-	height:50%;
+	height:52.95%;
 	position:absolute;
 	top: 40%;
 	left: 31%;

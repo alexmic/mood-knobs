@@ -48,8 +48,14 @@ var App = function()
 		
 		init: function() 
 		{
-			var h = $(window).height() - 50;	
-			$("#main").height(h);
+			function _resize() {
+				var h = $(window).height() - $('#title').height();	
+				$("#main").height(h);
+				console.log(h);
+			}
+			_resize();
+			$(window).resize(_resize);
+
 			
 			// Make knobs.
 			var proxied = $.proxy(function(i, e) {
