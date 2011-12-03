@@ -2,10 +2,16 @@
 	App Styles
 -----------------------------*/
 
+.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.clearfix { display: inline-block; }
+* html .clearfix { height: 1%; } /* Hides from IE-mac \*/
+.clearfix { display: block; }
+
 head, body {
 	height: 100%;
 	width: 100%;
 	background-image: url("../../res/imgs/black_denim.png");
+	font-size: 13px;
 }
 
 #title {
@@ -13,6 +19,7 @@ head, body {
 	line-height: 50px;
 	text-align: center;
 	border-bottom: 1px solid black;
+	font-size: 1.38em;
 }
 
 #synthi {
@@ -29,6 +36,17 @@ head, body {
 	position: relative;
 	width: 50%;
 	float:left;
+	margin-bottom: 25px;
+	text-align: center;
+}
+
+.text {
+	font-size: 0.846em;
+	color: white;
+	text-shadow: 0px 1px 0px black;
+	width: 45px;
+	position: absolute;
+	bottom: -15px;
 }
 
 
@@ -115,7 +133,8 @@ head, body {
 	-o-transition:0.3s;
 	transition:0.3s;
 	-webkit-box-shadow: inner 0px 1px 5px #red;
-	border: 1px solid #222;
+	border-bottom: 1px solid #272727;
+	border-left: 1px solid #272727;
 	-webkit-border-radius: 4px;
 }
 

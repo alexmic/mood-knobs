@@ -24,6 +24,9 @@ var Knob = function(elemId, searchTerm)
 			
 			elem.html(
 				"<div class='bars'>" +
+					"<div class='text'>" +
+					searchTerm +
+					"</div>" +
 					"<div class='control'>" +
 					"</div>" +
 				"</div>");
@@ -44,13 +47,13 @@ var Knob = function(elemId, searchTerm)
 			var colorBars = barsElem.find('.colorBar');
 			
 			// Draw knob.
-			$(elem.find(".control")).knobKnob({
+			$("#" + elemId + " div.bars div.control").knobKnob({
 				snap : 10,
 				value: 0,
 				turn : function(ratio) {
 					var step = Math.round((ratio * steps) / 0.5);
 					colorBars.each(function(i, e) {
-						if (i > step) {
+						if (i >= step) {
 							$(e).css("backgroundColor", "black");
 						} else {
 							$(e).css("backgroundColor", $(e).attr("active-color"));
