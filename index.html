@@ -22,8 +22,10 @@
 			</div>
 		</div>
 		<div id="anim" class="column clearfix">
-		
 		</div>
+		<div id="playlist" class="column clearfix">
+		    
+	    </div>
 	</div>
 	
 	<script src="libs/js/jquery.js"></script>
@@ -33,11 +35,14 @@
 	<script src="libs/js/transform.js"></script>
 	<script src="libs/js/knobknob.jquery.js"></script>
 	<script>
+	    
+	    var MHD = MHD || {};
+	
 		$(function() {
 			sp  = getSpotifyApi(1);
-			var a   = sp.require("app/app"),
-				app = a.App();
-			app.init().draw().search(true);
+			var a   = sp.require("app/app");
+			MHD.app = a.App();
+			MHD.app.init().draw().search(true);
 		});
 	</script>
 </body>

@@ -1,58 +1,96 @@
-var spm = sp.require("app/spotify-metadata");
+var spm = sp.require("app/spotify-metadata"),
+    m = sp.require('sp://import/scripts/api/models');
+
+var songIds = {};
 
 var Song = function(data) 
 {
 	var title = data.title,
 		artist = data.artist_name,
-		top  = 0,
-		spUrl = null,
-		elem = $("<div class='song'>" + title + "</div>")
-				.css({
-					top: top,
-					position: 'absolute'
-				}),
+		top   = 0,
+		track = null,
+		selected = false,
+		id    = null,
+		elem  = $("<div class='song'>" + title + "</div>"),
 		speed = 1;
 	
-	// Find spotify url.
-	var onDrag = function() {
-		console.log("start drag");
-		var onSearchReturn = function(err, tracks) {
-			if (err) {
-				throw "Blow";
-			} 
-			if (tracks) {
-				console.log(tracks);
-			}
+	var onSearchReturn = function(err, tracks) {
+		if (err) {
+			throw "Blow";
+		} 
+		if (tracks && tracks.length > 0) {
+            track = tracks[0];
+            id  = track.uri.split(":")[2];
+            $(elem).attr("id", id)
+		} else {
+			// TODO: handle.
+			console.log('no tracks.');
 		}
-		spm.searchForTrack(artist, 
-						   title,
-						   onSearchReturn);
-	
+	}
+	spm.searchForTrack(artist, 
+					   title,
+					   onSearchReturn);
+		
+	var exports = {
+	    track: function() {
+	        return track;
+	    },
+	    title: function() {
+	        return title;
+	    },
+	    artist: function() {
+	        return artist;
+	    },
+	    selected: function(val) {
+	       if (val) {
+	           selected = val;
+	       } else {
+	           return selected;
+	       }
+	    },
+	    id: function(){
+	        return id;
+	    },
+	    draw: function() {
+	        $("#anim").prepend(elem);
+	        console.log("HEY, draw that.")
+	    },
+		hasSpotifyTrack: function() {
+		    return track !== null;
+		}
 	};
-	
-	
-	$("#anim").append(elem);
 	
 	elem.draggable({
 		helper: 'clone',
-		containment: '#main',
-		start: onDrag
+		containment: '#main'
 	});
-	
-	return {
-		
-		update: function() 
-		{
-				top += speed;
-				elem.css('top', top);
-		},
-		
-		inBounds: function()
-		{
-			return true;
-		}
-	}
+    
+    return exports;
 
+};
+
+var Playlist = function(elemId) {
+    var elem = $("#" + elemId),
+        songs = [],
+        spPlaylist = null;
+
+    var onDrop = function(event, ui) {
+        var draggable = ui.draggable,
+            song = songIds[draggable.attr("id")];
+        songs.push(song);
+        elem.append($("<div class=''>" + song.title() + "</div>"));
+        console.log(spPlaylist);
+        if (spPlaylist === null) {
+            spPlaylist = new m.Playlist('alex');            
+        }
+        console.log(song.track().uri);
+        spPlaylist.add(m.Track.fromURI(song.track().uri));
+        console.log("asfaasf");
+    }
+
+    elem.droppable({
+	    drop: onDrop
+	});  
 };
 
 var Knob = function(elemId, searchTerm, initialValue)
@@ -76,7 +114,8 @@ var Knob = function(elemId, searchTerm, initialValue)
 	return {
 		
 		boost: 0,
-		
+		searchTerm: searchTerm,
+
 		getQS: function() 
 		{
 			return searchTerm + "^" + this.boost;	
@@ -125,6 +164,10 @@ var Knob = function(elemId, searchTerm, initialValue)
 							$(e).css("backgroundColor", $(e).attr("active-color"));
 						}
 					});
+				},
+				trigger: function() {
+				    // send out a new search.
+				    MHD.app.search();
 				}
 			});
 		}
@@ -142,7 +185,7 @@ var App = function()
 		params    = $.param({
 			api_key : apiKey,
 			format  : 'json',
-			results : 100
+			results : 16
 		}),
 		baseQuery = 'http://developer.echonest.com/api/v4/song/search?' + params,
 		titleElem = $("#title"); 
@@ -150,6 +193,7 @@ var App = function()
 	return {
 		
 		buffer: [],
+		playlist: null,
 		init: function() 
 		{
 			var h = $(document).height() - titleElem.height();	
@@ -175,6 +219,9 @@ var App = function()
 			}, this);
 
 			$(".synthi-knob").each(proxied);
+			
+			this.playlist = new Playlist("playlist");
+			
 			return this;
 		},
 		
@@ -199,23 +246,52 @@ var App = function()
 				knobTerms = []; 
 			
 			for (i = 0; i < knobs.length; i++) {
-				knobTerms.push(knobs[i].getQS());
+			    var boost = knobs[i].boost;
+			    if (boost != 0) {
+			        var searchTerm = knobs[i].searchTerm;
+			        var q = searchTerm + "^" + boost
+    				knobTerms.push(q);
+				}
 			}
 			
 			qs += knobTerms.join("&mood=");
+	        
+	        console.log("url: " + qs)
 	
 			// Buffer 100 results.
 			$.getJSON(qs, $.proxy(function(data) {
+			    
 				if (data.response.status.message === 'Success') {
-					this.buffer = data.response.songs;
-				}
-				if (startAnim) {
-					this.animate();
+				    $("#anim").empty();
+					var d = data.response.songs;
+				    for (var i = 0; i < d.length; i++) {
+				        var song = new Song(d[i]);
+                        this.buffer.push(song);
+				    }
+				    var c = 0;
+				    var safety = 0
+				    while (true) {
+				        var s = this.pick();
+                        if (s !== null) {
+                            s.draw();
+                            c++;
+                        } 
+                        if (c === 10) {
+                            break;
+                        }
+                        safety++;
+                        if (safety > 1024) {
+                            break;
+                        }
+				    }
+				    
+				} else {
+				    throw "uhm.";
 				}
 			}, this));
 		},
 		
-		animate: function() 
+		start: function() 
 		{
 			running = true;
 			var lastFrame = null,
@@ -223,36 +299,27 @@ var App = function()
 				that      = this,
 				drawables = [],
 				i = 0;
-			(function animLoop(time) {
-				if (running) {
-					webkitRequestAnimationFrame(animLoop, $("#anim"));
-					var now = new Date();
-					if (lastFrame !== null) {
-						diff += now - lastFrame;
-						if (diff > 2000) {
-							var song = that.pick();
-							drawables.push(song);
-							diff = 0;
-						}
-						for (i = 0; i < drawables.length; i++) {
-							var d = drawables[i];
-							if (!d) {
-								return;
-							}
-							d.update();
-							if (!d.inBounds()) {
-								delete drawables[i];
-							}
-						}
-					}
-					lastFrame = now;
-				}
-    		})();		
+			console.log("Asfa");
+			window.setInterval(function() {
+			    console.log("af");
+                
+			}, 1000);
 		},
 		
 		pick: function() 
 		{
-			return new Song(this.buffer.pop());
+		    // pick the first one that has a spotify uri.
+		    var i;
+		    for (i = 0; i < this.buffer.length; i++) {
+		        var s = this.buffer[i];
+		        if (s.hasSpotifyTrack()) {
+		            songIds[s.id()] = s;
+		            this.buffer.splice(i, 1);
+		            return s;
+		        }
+		    }
+		    console.log('it never did return.')
+		    return null;
 		},
 		
 		stopAnimation: function() 
@@ -266,3 +333,4 @@ var App = function()
 
 exports.Knob = Knob;
 exports.App  = App;
+exports.Playlist = Playlist;

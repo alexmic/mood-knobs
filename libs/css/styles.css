@@ -36,6 +36,12 @@ head, body {
 	height: 100%;
 }
 
+#playlist {
+    width: 200px;
+    height: 100%;
+    background-color: red;
+}
+
 .synthi-knob {
 	height: 20%;
 	margin: 0 auto;
@@ -67,6 +73,7 @@ head, body {
 	border-radius: 5px;
 	color: black;
 	height: 50px;
+	z-index: 8;
 }
 
 

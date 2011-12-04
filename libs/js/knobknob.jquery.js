@@ -13,7 +13,8 @@
 		var options = $.extend({
 			snap: 0,
 			value: 0,
-			turn: function(){}
+			turn: function(){},
+			trigger: function(){}
 		}, props || {});
 	
 		var tpl = '<div class="knob">\
@@ -109,6 +110,8 @@
 					
 					// Marking the starting degree as invalid
 					startDeg = -1;
+					
+					options.trigger()
 				});
 			
 			});
