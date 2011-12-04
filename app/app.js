@@ -366,37 +366,37 @@ var App = function()
                 var boost      = knobs[i].boost(),
                     searchTerm = knobs[i].searchTerm();
                 if (boost > 0) {
-                	moods.push([searchTerm, boost]);
+                    moods.push([searchTerm, boost]);
                 }
             }
 
             enm.searchSongsByMoods(moods, $.proxy(function(err, songs) {
-            	if (err !== null) {
-            		throw 'error';
-            	}
-            	if (songs === null) {
-            		return;
-            	}
-            	
-            	$("#playlist #name div").html(this.derivePlaylistName());
+                if (err !== null) {
+                    throw 'error';
+                }
+                if (songs === null) {
+                    return;
+                }
+                
+                $("#playlist #name div").html(this.derivePlaylistName());
                 $("#anim").children().fadeOut();
-            	
-            	this.buffer = [];
-            	var seen = {};
+                
+                this.buffer = [];
+                var seen = {};
                 for (var i = 0; i < songs.length; i++) {
-                	var song = new Song(songs[i]);
+                    var song = new Song(songs[i]);
                     var dedup = (song.title().replace(/\s/g, "") 
                                  + song.artist().replace(" ", ""))
                                  .toLowerCase();
                     if (!seen[dedup]) {
-                    	this.buffer.push(song);
+                        this.buffer.push(song);
                         seen[dedup] = true;
                     }
                 }
-            	
-            	shuffle(this.buffer);
+                
+                shuffle(this.buffer);
                 window.setTimeout($.proxy(hiSongs, this), 1000);
-            	
+                
             }, this));
         },
         
