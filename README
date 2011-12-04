@@ -1,1 +1,16 @@
-music hack day project
+========================================
+#                                      #
+#   MUSIC HACKDAY LONDON 2012 PROJECT  #
+#                                      #
+========================================
+
+@alexismic
+@liesen
+@mollerstrand
+
+(in alphabetic order)
+
+So we made this Spotify App for Music Hack Day. It's a synthesizer-y interface with knobs and shit, which provides a sweet mood-based
+search interface to the Echo Nest API. Tracks are then matched across the Spotify catalog so you can create playlists.
+
+Thanks #musichackday for an awesome weekend.
