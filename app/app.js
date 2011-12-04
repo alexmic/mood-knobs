@@ -1,19 +1,31 @@
 var spm = sp.require("app/spotify-metadata"),
-    m = sp.require('sp://import/scripts/api/models');
+	enm = sp.require("app/echonest-metadata"),
+    m   = sp.require('sp://import/scripts/api/models');
 
+// Global song registry.
 var songIds = {};
+
+// ==================== Song ==================== //
 
 var Song = function(data)
 {
-	var title = data.title,
-		artist = data.artist_name,
-		top   = 0,
-		track = null,
-		selected = false,
-		id    = null,
-		elem  = $("<div class='song'>" + artist + " — " + title + "</div>"),
-		speed = 1;
-
+	var title    = data.title,
+		artist   = data.artist_name,
+		artistId = data.artist_id, 
+		top      = 0,
+		track    = null,
+		id       = null,
+		elem     = $("<div class='song' style='display:none'>" +
+				   	  "<div class='img'></div>" +
+					  "<div class='dets'>" + 
+						"<div class='artist'>" +
+							artist +
+						"</div>" +
+						"<div class='title'>" +
+							title +
+						"</div>" +
+					  "</div>");
+					
 	var onSearchReturn = function(err, tracks) {
 		if (err) {
 			throw "Blow";
@@ -22,75 +34,92 @@ var Song = function(data)
             track = tracks[0];
             id  = track.uri.split(":")[2];
             $(elem).attr("id", id)
+            enm.searchForImage(artistId, function(err, img) {
+            	if (err === null && img !== null) {
+            		elem.find('.img').css({
+            			backgroundImage: "url(" + img + ")"
+            		});
+            	}
+            });
 		} else {
 			// TODO: handle.
 			console.log('no tracks.');
 		}
 	}
+	
 	spm.searchForTrack(artist,
 					   title,
 					   onSearchReturn);
-
-	var exports = {
-	    track: function() {
-	        return track;
-	    },
-	    title: function() {
-	        return title;
-	    },
-	    artist: function() {
-	        return artist;
-	    },
-	    selected: function(val) {
-	       if (val) {
-	           selected = val;
-	       } else {
-	           return selected;
-	       }
-	    },
-	    id: function(){
-	        return id;
-	    },
-	    draw: function() {
-	        $("#anim").prepend(elem);
-	        console.log("HEY, draw that.")
-	    },
-		hasSpotifyTrack: function() {
-		    return track !== null;
-		}
-	};
-
-	elem.draggable({
-		helper: 'clone',
-		containment: '#main'
+	
+	elem = elem.draggable({
+		containment: '#main',
+      	revert: true
 	});
 
-    return exports;
-
+	return {
+		track: function() {
+			return track;
+		},
+		title: function() {
+			return title;
+		},
+		artist: function() {
+			return artist;
+		},
+		id: function() {
+			return id;
+		},
+	    draw: function(fade) {
+	   		$("#anim").prepend(elem);
+	    	if (fade) {
+	    		elem.fadeIn();
+	    	} else {
+	    		elem.show();
+	    	}
+	    }
+	};
 };
 
-var Playlist = function(elemId) {
-    var elem = $("#" + elemId),
+// ==================== Playlist ==================== //
+
+var Playlist = function(elem) 
+{
+    var elem  = elem,
         songs = [],
         spPlaylist = null;
 
     var onDrop = function(event, ui) {
+        var l = $("#anim .song").length;
         var draggable = ui.draggable,
             song = songIds[draggable.attr("id")];
         songs.push(song);
-        elem.append($("<div class=''>" + song.title() + "</div>"));
-        console.log(spPlaylist);
+        draggable.draggable('option', 'revert', false);
+        elem.find("#songs").append($("<div class='s'>" + song.artist() + " - " + song.title() + "</div>"));
+        draggable.remove();
+        MHD.app.renderMore(l - $("#anim .song").length);
+        var name = elem.find("#name div").html();
         if (spPlaylist === null) {
-            spPlaylist = new m.Playlist('alex');
+        	spPlaylist = new m.Playlist(name);
         }
-        console.log(song.track().uri);
+        if (spPlaylist.name !== name) {
+        	spPlaylist.name = name;
+        }
         spPlaylist.add(m.Track.fromURI(song.track().uri));
-        console.log("asfaasf");
-    }
+    };
 
-    elem.droppable({
+    elem.find("#songs").droppable({
 	    drop: onDrop
 	});
+	
+	return {
+		
+		songs: function() {
+			return songs;
+		},
+		spPlaylist: function() {
+			return spPlaylist;
+		}
+	}
 };
 
 var Knob = function(elemId, searchTerm, initialValue)
@@ -102,25 +131,34 @@ var Knob = function(elemId, searchTerm, initialValue)
 		deg 	   = 0,
 		barsElem   = null,
 		steps      = 10,
+		boost      = 0,
 		height     = elem.height(),
 		width      = elem.width(),
 		radius	   = null,
+		boost      = 0,
 		initial    = initialValue || 0,
 		colors     = [
 			'26e000','51ef00','B8FF05','FFEA05','FFC60A',
 			'ff8607','ff7005', 'ff5f04','ff4f03','f83a00','ee2b00'
 		];
+		
+		
 
 	return {
-
-		boost: 0,
-		searchTerm: searchTerm,
-
-		getQS: function()
-		{
-			return searchTerm + "^" + this.boost;
+		boost: function(b) {
+			if (b) {
+				boost = b;
+			} else {
+				return boost;
+			}
 		},
-
+		searchTerm: function(st) {
+			if (st) {
+				searchTerm = st;
+			} else {
+				return searchTerm;
+			}
+		},
 		draw: function()
 		{
 			elem.empty();
@@ -142,21 +180,20 @@ var Knob = function(elemId, searchTerm, initialValue)
 				deg = i*18;
 				$('<div class="colorBar">').css({
 					transform:'rotate('+deg+'deg)',
-					top: -Math.sin(deg/rad2deg)*radius+height/1.5,
-					left: Math.cos((180 - deg)/rad2deg)*radius+width/2.15,
+					top: -Math.sin(deg/rad2deg)*radius+height * 0.46,
+					left: Math.cos((180 - deg)/rad2deg)*radius+width * 0.4,
 				}).attr("active-color", "#" + colors[i]).appendTo(barsElem);
 			}
 
 			var colorBars = barsElem.find('.colorBar');
 
 			// Draw knob.
-			var that = this;
 			$("#" + elemId + " div.bars div.control").knobKnob({
 				snap : 10,
 				value: initial,
 				turn : function(ratio) {
 					var dialStep = Math.min(9, Math.round((ratio * steps) / 0.5));
-					that.boost   = Math.min(2, Math.round((10 * (ratio * 2) / 0.5)) / 10);
+					boost = Math.min(2, Math.round((10 * (ratio * 2) / 0.5)) / 10);
 					colorBars.each(function(i, e) {
 						if (i >= dialStep) {
 							$(e).css("backgroundColor", "black");
@@ -178,26 +215,79 @@ var Knob = function(elemId, searchTerm, initialValue)
 
 var App = function()
 {
-	var knobs     = [],
-		mainElem  = $("#main"),
-		running   = false,
-		apiKey    = "N6E4NIOVYMTHNDM8J",
-		params    = $.param({
+	var knobs      = [],
+		mainElem   = $("#main"),
+		animElem   = $("#anim"),
+		playElem   = $("#playlist"),
+		synthiElem = $("#synthi"),  
+		running    = false,
+		apiKey     = "N6E4NIOVYMTHNDM8J",
+		params     = $.param({
 			api_key : apiKey,
 			format  : 'json',
 			results : 64,
 		}),
+		numSongs = 0,
 		baseQuery = 'http://developer.echonest.com/api/v4/song/search?' + params,
 		titleElem = $("#title");
+		
+	function shuffle(list) 
+	{
+  		var i, j, t;
+  		for (i = 1; i < list.length; i++) {
+    		j = Math.floor(Math.random()*(1+i));
+    		if (j !== i) {
+      			t = list[i];                   
+      			list[i] = list[j];
+      			list[j] = t;
+    		}
+  		}
+	};
+	
+	var hiSongs = function(force, fade) 
+	{
+    	var c = 0,
+    		n = force || numSongs,
+    		safety = 0;
+    	while (true) {
+    		var s = MHD.app.pick();
+    		if (s !== null) {
+    			s.draw(fade);
+    			c++;
+            }
+            if (c === n) {
+            	break;
+            }
+            safety++;
+            if (safety > 1024) {
+            	break;
+            }
+        }
+	};
 
 	return {
 
 		buffer: [],
 		playlist: null,
+		knobs: knobs,
 		init: function()
 		{
-			var h = $(document).height() - titleElem.height();
+			var h = $(document).height() - titleElem.height(),
+				w = $(document).width();
+			
 			mainElem.height(h);
+			mainElem.width(w);
+			
+			synthiElem.height(h);
+			synthiElem.width(w/3);
+			
+			animElem.height(h);
+			animElem.width(w/3);
+			
+			playElem.height(h);
+			playElem.width(w/3);
+			
+			numSongs = Math.round(h / 45);
 
 			// Redraw on resize.
 			$(document).resize(_.debounce(function() {
@@ -208,6 +298,8 @@ var App = function()
 
 			// Make and store knobs.
 			var proxied = $.proxy(function(i, e) {
+				$(e).width(synthiElem.width() * 0.5)
+					.height(synthiElem.height() * 0.25);
 				var id   = $(e).attr("id"),
 					term = id.split("-")[1],
 					rnd  = Math.random(),
@@ -220,11 +312,14 @@ var App = function()
 
 			$(".synthi-knob").each(proxied);
 
-			this.playlist = new Playlist("playlist");
-
+			this.playlist = new Playlist(playElem);
+			
 			return this;
 		},
-
+		renderMore: function(n) 
+		{
+			hiSongs(n, true);
+		},
 		draw: function()
 		{
 			var i = 0, l = knobs.length;
@@ -234,11 +329,6 @@ var App = function()
 			return this;
 		},
 
-		knobs: function()
-		{
-			return knobs;
-		},
-
 		search: function(startAnim)
 		{
 			var i = 0,
@@ -246,90 +336,67 @@ var App = function()
 				knobTerms = [];
 
 			for (i = 0; i < knobs.length; i++) {
-			    var boost = knobs[i].boost;
+			    var boost 	   = knobs[i].boost(),
+			    	searchTerm = knobs[i].searchTerm();
+			    console.log(boost);
 			    if (boost != 0) {
-			        var searchTerm = knobs[i].searchTerm;
-			        var q = searchTerm + "^" + boost
+			        var q = searchTerm + "^" + boost;
     				knobTerms.push(q);
 				}
 			}
 
 			qs += "mood=" + knobTerms.join("&mood=");
+			
+			console.log(qs);
 
-	        console.log("url: " + qs)
-
-			// Buffer 100 results.
 			$.getJSON(qs, $.proxy(function(data) {
 				if (data.response.status.message === 'Success') {
-				    $("#anim").empty();
+					$("#playlist #name div").html(this.derivePlaylistName());
+				    $("#anim").children().fadeOut();
 				    this.buffer = [];
 					var d = data.response.songs;
 				    for (var i = 0; i < d.length; i++) {
 				        var song = new Song(d[i]);
                         this.buffer.push(song);
 				    }
-				    var f = function() {
-                        var c = 0,
-    				        safety = 0;
-    				    while (true) {
-    				        var s = this.pick();
-                            if (s !== null) {
-                                s.draw();
-                                c++;
-                            }
-                            if (c === 10) {
-                                break;
-                            }
-                            safety++;
-                            if (safety > 1024) {
-                                break;
-                            }
-    				    }
-                    };
-                    window.setTimeout($.proxy(f, this), 1000);
-                    // window.setTimeout($.proxy(f, this), 100);
+				    shuffle(this.buffer);
+                    window.setTimeout($.proxy(hiSongs, this), 1000);
 				} else {
 				    throw "uhm.";
 				}
 			}, this));
 		},
-
-		start: function()
-		{
-			running = true;
-			var lastFrame = null,
-				diff      = 0,
-				that      = this,
-				drawables = [],
-				i = 0;
-			console.log("Asfa");
-			window.setInterval(function() {
-			    console.log("af");
-
-			}, 1000);
-		},
-
+		
 		pick: function()
 		{
 		    // pick the first one that has a spotify uri.
 		    var i;
 		    for (i = 0; i < this.buffer.length; i++) {
 		        var s = this.buffer[i];
-		        if (s.hasSpotifyTrack()) {
+		        if (s.track() !== null) {
 		            songIds[s.id()] = s;
 		            this.buffer.splice(i, 1);
 		            return s;
 		        }
 		    }
-		    console.log('it never did return.')
 		    return null;
 		},
-
-		stopAnimation: function()
+		
+		derivePlaylistName: function() 
 		{
-			running = false;
+			var name = "";
+			for (var i in knobs) {
+				if (knobs.hasOwnProperty(i)) {
+					var knob = knobs[i];
+					console.log(knob.boost());
+					if (knob.boost() > 0) {
+						name += knob.searchTerm();
+					}
+				}
+			}
+			console.log(name);
+			return name || "noname";
 		}
-
 	};
 
 };
@@ -337,3 +404,4 @@ var App = function()
 exports.Knob = Knob;
 exports.App  = App;
 exports.Playlist = Playlist;
+exports.Song = Song;

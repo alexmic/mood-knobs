@@ -13,5 +13,9 @@
     					    "http://ws.audioscrobbler.com", 
     					    "ws.audioscrobbler.com",
     					    "http://developer.echonest.com",
-    					    "developer.echonest.com"]
+    					    "developer.echonest.com",
+    					    "http://*.last.fm",
+    					    "http://*.myspacecdn.com",
+    					    "http://*.amazon.com",
+    					    "http://www.oldchesterpa.com"]
 }

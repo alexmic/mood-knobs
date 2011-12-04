@@ -12,7 +12,7 @@ exports.searchForTrack = function (artist, track, callback) {
 
           if (territories == 'worldwide' ||
               territories.split(' ').indexOf(sp.core.country) >= 0) {
-            tracks.push(m.Track.fromURI(track.href).data);
+            tracks.push(m.Track.fromURI(track.href));
           }
         });
 

@@ -18,37 +18,20 @@ head, body {
 	height: 49px;
 	line-height: 50px;
 	text-align: center;
-	border-bottom: 1px solid black;
+	border-bottom: 2px solid black;
 	font-size: 1.38em;
-	z-index: 10;
+	z-index: 20;
+	background-image: url("../../res/imgs/dark_leather.png");
 }
 
-#synthi {
-	width: 300px;
-	height: 100%;
-	/*background-image: url("../../res/imgs/back.png");
-	border-right: 1px solid black;
-	-webkit-box-shadow: 1px 0px 5px #222;*/
-}
-
-#anim {
-	width: 350px;
-	height: 100%;
-}
-
-#playlist {
-    width: 200px;
-    height: 100%;
-    background-color: red;
+#main {
+	border-top: 1px solid #191919;
 }
 
 .synthi-knob {
-	height: 20%;
 	margin: 0 auto;
 	position: relative;
-	width: 50%;
 	float:left;
-	margin-bottom: 25px;
 	text-align: center;
 }
 
@@ -56,9 +39,14 @@ head, body {
 	font-size: 0.846em;
 	color: white;
 	text-shadow: 0px 1px 0px black;
-	width: 45px;
+	padding: 3px;
+	width: 60px;
+	box-shadow: 0px 1px 4px black;
+	background-color: #222;
+	border-radius: 3px;
+	bottom: 10px;
+	left: 25%;
 	position: absolute;
-	bottom: -15px;
 }
 
 .column {
@@ -67,15 +55,100 @@ head, body {
 }
 
 .song {
-	width: 350px;
 	box-shadow: 0px 1px 4px black;
-	background-color: white;
-	border-radius: 5px;
-	color: black;
-	height: 50px;
-	z-index: 8;
+	background-color: #222;
+	height: 33px;
+	border-bottom: 1px solid black;
+	border-top: 1px solid #292929;
+	text-shadow: 0px 1px 0px #292929;
+	font-size: 0.846em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	z-index: 500;
+	padding: 5px;
+	width: 96%;
 }
 
+.song:hover {
+	cursor: pointer;
+	background-color: #242424;
+}
+	.song .img {
+		height: 32px;
+		width: 32px;
+		border: 1px solid black;
+		float: left;
+		margin-right: 6px;
+		background-size: 32px 32px;
+	}
+	
+	.song .dets {
+		float: left;
+	}
+	.song .artist {
+		font-weight: bold;
+		color: white;
+	}
+	
+#playlist {	border-top: 1px solid #292929;
+
+	box-shadow: 0px 1px 4px black;
+	background-color: #222;
+}
+
+#playlist #name {
+	margin: 0px;
+	padding: 0px;
+	height: 43px;
+	line-height: 43px;
+	border-bottom: 1px solid black;
+}
+
+#playlist #songs {
+	border-top: 1px solid #292929;
+	height: 100%;
+}
+
+	#playlist #name div, 
+	#playlist #name button {
+		border: none;
+		top: 0;
+		left: 0;
+		margin: 0;
+		padding:0;
+		position: relative;
+		left: 6px;
+		border-radius: 3px;
+		float: left;
+	}
+	
+	#playlist #name div {
+		width: 79%;
+		font-weight: bold;
+		font-sizse: 0.923em;
+		height: 45px;
+		color: white;
+	}
+	
+	#playlist #name button {
+		height: 25px;
+		top: 10px;
+		border: 1px solid black;
+	}
+
+	
+	#playlist #save input:focus {
+		background-color: white;
+	}
+	
+	.s {
+		font-size: 0.823em;
+		padding-top: 4px;
+		padding-bottom: 4px;
+		padding-left: 3px;
+		border-top: 1px solid #292929;
+		border-bottom: 1px solid black;
+	}	
 
 /*----------------------------
 	knobKnob Styles
@@ -139,13 +212,14 @@ head, body {
 .bars{
 	height: 100%;
 	width: 100%;
+	text-align: center;
 }
 
 .control{
-	width:39%;
-	height:50%;
+	height: 45px;
+	width: 45px;
 	position:absolute;
-	top: 40%;
+	top: 30%;
 	left: 31%;
 }
 
@@ -168,3 +242,55 @@ head, body {
 .colorBar.active{
 	opacity:1;
 }
+
+
+/*----------------------------
+	Button
+-----------------------------*/
+
+button.cupid-green {
+  background-color: #7fbf4d;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#7fbf4d), to(#63a62f));
+  /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #7fbf4d, #63a62f);
+  background-image: -moz-linear-gradient(top, #7fbf4d, #63a62f);
+  background-image: -ms-linear-gradient(top, #7fbf4d, #63a62f);
+  background-image: -o-linear-gradient(top, #7fbf4d, #63a62f);
+  background-image: linear-gradient(top, #7fbf4d, #63a62f);
+  border: none;
+  -webkit-box-shadow: inset 0 1px 0 0 #96ca6d;
+  -moz-box-shadow: inset 0 1px 0 0 #96ca6d;
+  -ms-box-shadow: inset 0 1px 0 0 #96ca6d;
+  -o-box-shadow: inset 0 1px 0 0 #96ca6d;
+  box-shadow: inset 0 1px 0 0 #96ca6d;
+  color: #fff;
+  height: 25px;
+  line-height: 25px;
+  font: bold 11px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 -1px 0 #4c9021;
+  width: 50px; }
+  button.cupid-green:hover {
+    background-color: #76b347;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#76b347), to(#5e9e2e));
+    /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, #76b347, #5e9e2e);
+    background-image: -moz-linear-gradient(top, #76b347, #5e9e2e);
+    background-image: -ms-linear-gradient(top, #76b347, #5e9e2e);
+    background-image: -o-linear-gradient(top, #76b347, #5e9e2e);
+    background-image: linear-gradient(top, #76b347, #5e9e2e);
+    -webkit-box-shadow: inset 0 1px 0 0 #8dbf67;
+    -moz-box-shadow: inset 0 1px 0 0 #8dbf67;
+    -ms-box-shadow: inset 0 1px 0 0 #8dbf67;
+    -o-box-shadow: inset 0 1px 0 0 #8dbf67;
+    box-shadow: inset 0 1px 0 0 #8dbf67;
+    cursor: pointer; }
+  button.cupid-green:active {
+    border: 1px solid #5b992b;
+    border-bottom: 1px solid #538c27;
+    -webkit-box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
+    -moz-box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
+    -ms-box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
+    -o-box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
+    box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee; }
