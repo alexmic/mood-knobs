@@ -17,5 +17,6 @@
     					    "http://*.last.fm",
     					    "http://*.myspacecdn.com",
     					    "http://*.amazon.com",
-    					    "http://www.oldchesterpa.com"]
+    					    "http://www.oldchesterpa.com",
+    					    "http://*.wikimedia.org"]
 }

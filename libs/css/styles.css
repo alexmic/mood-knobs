@@ -18,9 +18,11 @@ head, body {
 	height: 49px;
 	line-height: 50px;
 	text-align: center;
+	color: white;
 	border-bottom: 2px solid black;
-	font-size: 1.38em;
+	font-size: 1.153em;
 	z-index: 20;
+	text-shadow: 0px 1px 0px black;
 	background-image: url("../../res/imgs/dark_leather.png");
 }
 
@@ -66,12 +68,17 @@ head, body {
 	text-overflow: ellipsis;
 	z-index: 500;
 	padding: 5px;
+	position: relative;
 	width: 96%;
 }
 
-.song:hover {
+.song:hover, .s:hover {
 	cursor: pointer;
 	background-color: #242424;
+}
+
+.song:hover .dets span, .s:hover span {
+	visibility: visible;
 }
 	.song .img {
 		height: 32px;
@@ -90,6 +97,18 @@ head, body {
 		color: white;
 	}
 	
+	.song .dets span, .s span {
+		position: absolute;
+		right: 8px;
+		visibility: hidden;
+		bottom: 3px;
+	}
+	
+		.s span {
+	 		bottom: 2px;
+	 		right: 12px;
+	 	}
+	
 #playlist {	border-top: 1px solid #292929;
 
 	box-shadow: 0px 1px 4px black;
@@ -102,31 +121,21 @@ head, body {
 	height: 43px;
 	line-height: 43px;
 	border-bottom: 1px solid black;
+	text-align: center;
 }
 
 #playlist #songs {
 	border-top: 1px solid #292929;
-	height: 100%;
+	min-height: 400px;
 }
 
-	#playlist #name div, 
-	#playlist #name button {
-		border: none;
-		top: 0;
-		left: 0;
-		margin: 0;
-		padding:0;
-		position: relative;
-		left: 6px;
-		border-radius: 3px;
-		float: left;
-	}
-	
 	#playlist #name div {
-		width: 79%;
+		width: 100%;
 		font-weight: bold;
-		font-sizse: 0.923em;
+		font-size: 0.846em;
 		height: 45px;
+		overflow: hidden;
+		text-overflow-mode: ellipsis;
 		color: white;
 	}
 	
@@ -143,6 +152,7 @@ head, body {
 	
 	.s {
 		font-size: 0.823em;
+		position: relative;
 		padding-top: 4px;
 		padding-bottom: 4px;
 		padding-left: 3px;

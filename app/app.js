@@ -24,6 +24,7 @@ var Song = function(data)
 						"<div class='title'>" +
 							title +
 						"</div>" +
+						"<span><img src='../res/imgs/Play-Small.png' to play/></span>" + 
 					  "</div>");
 					
 	var onSearchReturn = function(err, tracks) {
@@ -41,6 +42,11 @@ var Song = function(data)
             		});
             	}
             });
+            elem.click((function(t) {
+            	return function() {
+            		m.player.play(t);
+            	}
+			})(track));
 		} else {
 			// TODO: handle.
 			console.log('no tracks.');
@@ -55,6 +61,7 @@ var Song = function(data)
 		containment: '#main',
       	revert: true
 	});
+	
 
 	return {
 		track: function() {
@@ -91,12 +98,23 @@ var Playlist = function(elem)
     var onDrop = function(event, ui) {
         var l = $("#anim .song").length;
         var draggable = ui.draggable,
-            song = songIds[draggable.attr("id")];
+            song = songIds[draggable.attr("id")],
+            newe = $("<div class='s'>" +
+            			"<div>" +
+            				song.artist() +
+            				" - " + 
+            				song.title() +
+            			"</div>" +
+            			"<span><img height='15' width='15' src='../res/imgs/Play-Small.png'/></span>" + 
+            			"</div>");
         songs.push(song);
+        elem.find("#songs").append(newe);
+        
         draggable.draggable('option', 'revert', false);
-        elem.find("#songs").append($("<div class='s'>" + song.artist() + " - " + song.title() + "</div>"));
         draggable.remove();
+        
         MHD.app.renderMore(l - $("#anim .song").length);
+        
         var name = elem.find("#name div").html();
         if (spPlaylist === null) {
         	spPlaylist = new m.Playlist(name);
@@ -104,7 +122,15 @@ var Playlist = function(elem)
         if (spPlaylist.name !== name) {
         	spPlaylist.name = name;
         }
-        spPlaylist.add(m.Track.fromURI(song.track().uri));
+        var track = m.Track.fromURI(song.track().uri);
+        spPlaylist.add(track);
+        
+        newe.click((function(t) {
+        	return function() {
+        		console.log("zf");
+            	m.player.play(t);
+            }
+		})(track));
     };
 
     elem.find("#songs").droppable({
@@ -272,7 +298,7 @@ var App = function()
 		knobs: knobs,
 		init: function()
 		{
-			var h = $(document).height() - titleElem.height(),
+			var h = $(document).height() - titleElem.height() - 20,
 				w = $(document).width();
 			
 			mainElem.height(h);
@@ -284,7 +310,7 @@ var App = function()
 			animElem.height(h);
 			animElem.width(w/3);
 			
-			playElem.height(h);
+			playElem.height(h-2);
 			playElem.width(w/3);
 			
 			numSongs = Math.round(h / 45);
@@ -305,7 +331,7 @@ var App = function()
 					rnd  = Math.random(),
 					init = 0;
 				if (rnd > 0.7) {
-					init = 90;
+					init = 45;
 				}
 				knobs.push(new Knob(id, term, init));
 			}, this);
@@ -354,10 +380,18 @@ var App = function()
 					$("#playlist #name div").html(this.derivePlaylistName());
 				    $("#anim").children().fadeOut();
 				    this.buffer = [];
+				    var seen = {};
 					var d = data.response.songs;
 				    for (var i = 0; i < d.length; i++) {
 				        var song = new Song(d[i]);
-                        this.buffer.push(song);
+				        var dedup = (song.title().replace(/\s/g, "") 
+				        			+ song.artist().replace(" ", ""))
+				        			.toLowerCase();
+				        console.log(dedup);
+				        if (!seen[dedup]) {
+				        	this.buffer.push(song);
+				        	seen[dedup] = true;
+				        }
 				    }
 				    shuffle(this.buffer);
                     window.setTimeout($.proxy(hiSongs, this), 1000);
@@ -384,18 +418,25 @@ var App = function()
 		
 		derivePlaylistName: function() 
 		{
-			var name = "";
+			var name = [];
 			for (var i in knobs) {
 				if (knobs.hasOwnProperty(i)) {
 					var knob = knobs[i];
 					console.log(knob.boost());
 					if (knob.boost() > 0) {
-						name += knob.searchTerm();
+						var extra = "";
+						if (knob.boost() > 1.6) {
+							extra = "too much";
+						} else if (knob.boost() >= 1) {
+							extra = "some";
+						} else {
+							extra = "a little";
+						}
+						name.push(extra + " " + knob.searchTerm());
 					}
 				}
 			}
-			console.log(name);
-			return name || "noname";
+			return (name.length > 0)? name.join(" and ") : "no name";
 		}
 	};
 
